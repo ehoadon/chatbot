@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mimi AI - Trợ lý thông minh</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --sad-gradient: linear-gradient(135deg, #a8a8a8 0%, #6c6c6c 100%);
+            --excited-gradient: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow-soft: 0 8px 25px rgba(0,0,0,0.08);
+            --shadow-medium: 0 15px 35px rgba(0,0,0,0.1);
+            --border-radius: 16px;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background particles */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        }
+        
+        /* Main Container */
+        .chat-container { 
+            width: min(480px, 100%);
+            height: min(90vh, 800px);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-medium);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        @keyframes slideUp { 
+            from { 
+                transform: translateY(50px) scale(0.95); 
+                opacity: 0; 
+            } 
+            to { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            } 
+        }
+
+        /* Header */
+        .chat-header { 
+            background: var(--primary-gradient);
+            color: white;
+            padding: 24px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 72px;
+            height: 72px;
+        }
+
+		.avatar {
+			width: 72px;
+			height: 72px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 32px;
+			transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+			border: 3px solid rgba(255,255,255,0.2);
+			position: relative;
+			overflow: hidden;
+			background: url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat;
+		}
+		.avatar i {
+			display: none !important;
+}
+
+        .mood-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #4CAF50;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .bot-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bot-name { 
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .bot-description {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .status { 
+            font-size: 12px;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status.online { color: #4CAF50; }
+        .status.offline { color: #f44336; }
+        .status.thinking { color: #ff9800; animation: thinking 1.5s infinite; }
+
+        @keyframes thinking {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Messages Area */
+        .chat-messages { 
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: var(--bg-light);
+            position: relative;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.1);
+            border-radius: 2px;
+        }
+        
+        .message-wrapper { 
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            animation: messageSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .message { 
+            display: flex;
+            align-items: flex-end;
+            max-width: 85%;
+            position: relative;
+        }
+        
+        .message-content { 
+            padding: 16px 20px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            position: relative;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .message-wrapper.user { 
+            align-items: flex-end;
+        }
+        
+        .message-wrapper.user .message { 
+            flex-direction: row-reverse;
+        }
+        
+        .message-wrapper.user .message-content { 
+            background: var(--primary-gradient);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .message-wrapper.bot { 
+            align-items: flex-start;
+        }
+        
+        .message-wrapper.bot .message-content { 
+            background: white;
+            color: var(--text-primary);
+            border-bottom-left-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .message-avatar { 
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+            box-shadow: var(--shadow-soft);
+            border: 2px solid var(--border-color);
+        }
+        
+        .message-wrapper.user .message-avatar { 
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* Timestamp & Actions */
+        .timestamp { 
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            padding: 0 16px;
+        }
+        
+        .message-wrapper.user .timestamp { 
+            text-align: right;
+        }
+
+        .message-actions {
+            position: absolute;
+            top: 50%;
+            right: -40px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .message-wrapper.bot:hover .message-actions {
+            opacity: 1;
+            right: -50px;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .action-icon:hover {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* Interactive Buttons */
+        .action-buttons { 
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .action-btn { 
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            color: var(--text-primary);
+        }
+        
+        .action-btn:hover { 
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Quick Actions */
+        .quick-actions { 
+            padding: 16px 24px;
+            background: white;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .quick-actions .action-btn {
+            width: 100%;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Input Area */
+        .chat-input { 
+            display: flex;
+            padding: 20px 24px;
+            align-items: center;
+            background: white;
+            border-top: 1px solid var(--border-color);
+            gap: 12px;
+        }
+        
+        .input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .chat-input input { 
+            width: 100%;
+            border: 2px solid var(--border-color);
+            background: var(--bg-light);
+            padding: 14px 20px;
+            border-radius: 24px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+        }
+
+        .chat-input input:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chat-input input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .send-btn { 
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: var(--primary-gradient);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-soft);
+        }
+        
+        .send-btn:hover:not(:disabled) { 
+            box-shadow: var(--shadow-medium);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 20px;
+            border-bottom-left-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            animation: typingDot 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            body { padding: 10px; }
+            .chat-container { 
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+            .chat-header { padding: 20px; }
+            .chat-messages { padding: 16px; }
+            .chat-input { padding: 16px; }
+        }
+
+        /* Mood-based avatar animations */
+        .avatar.happy {
+            animation: bounce 2s infinite;
+        }
+
+        .avatar.sad {
+            animation: sway 3s infinite;
+        }
+
+        .avatar.excited {
+            animation: wiggle 1s infinite;
+        }
+
+        .avatar.thinking {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+		@keyframes pulse-glow {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 5px rgba(102, 126, 234, 0.2);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(102, 126, 234, 0.5);
+    }
+}
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-3deg); }
+            75% { transform: rotate(3deg); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+		.message-wrapper.bot .message-avatar {
+			background: url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat;
+		}
+
+		.message-wrapper.bot .message-avatar i {
+			display: none !important;
+		}
+    </style>
+</head>
+<body>
+    <!-- Background Particles -->
+    <div class="bg-particles" id="particles"></div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="header-content">
+                <div class="avatar-container">
+                    <div class="avatar happy" id="botAvatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="mood-indicator" id="moodIndicator">😊</div>
+                </div>
+                <div class="bot-info">
+                    <div class="bot-name">Mimi AI</div>
+                    <div class="bot-description">Trợ lý thông minh của bạn</div>
+                    <div class="status online" id="botStatus">
+                        <div class="status-dot"></div>
+                        <span id="botStatusText">Đang hoạt động</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages"></div>
+        
+        <div class="quick-actions">
+            <button class="action-btn" onclick="enterTrainingMode()">
+                <i class="fas fa-graduation-cap"></i>
+                Dạy kiến thức mới cho Mimi
+            </button>
+        </div>
+        
+        <div class="chat-input">
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Nhập tin nhắn của bạn..." disabled>
+            </div>
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIG & STATE MANAGEMENT ---
+        const CONFIG = {
+            GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwMoW2ACPYuiM2c5xcJFhJuNQy7MA8SFEDvx46DOxXhG0I-014CXy-V42gmCMZpVhRk/exec',
+            SESSION_ID: 'session_' + Date.now()
+        };
+        
+        let chatState = { 
+            mode: 'normal', 
+            lastUserQuestion: '',
+            currentMood: 'happy'
+        };
+
+        // Mood configurations
+        const MOODS = {
+            happy: {
+                emoji: '😊',
+                color: '#4CAF50',
+                gradient: 'var(--success-gradient)',
+                animation: 'happy',
+                messages: ['Tôi đang cảm thấy rất vui!', 'Hôm nay thật tuyệt vời!']
+            },
+            sad: {
+                emoji: '😢',
+                color: '#607d8b',
+                gradient: 'var(--sad-gradient)',
+                animation: 'sad',
+                messages: ['Tôi hơi buồn...', 'Có vẻ như hôm nay không tốt lắm.']
+            },
+            excited: {
+                emoji: '🤩',
+                color: '#ff6b6b',
+                gradient: 'var(--excited-gradient)',
+                animation: 'excited',
+                messages: ['Tôi rất hào hứng!', 'Tuyệt vời quá!']
+            },
+            thinking: {
+                emoji: '🤔',
+                color: '#ff9800',
+                gradient: 'var(--warning-gradient)',
+                animation: 'thinking',
+                messages: ['Để tôi suy nghĩ...', 'Hmm, thú vị đây!']
+            },
+            best: {
+                emoji: '⭐',
+                color: '#ffd700',
+                gradient: 'var(--primary-gradient)',
+                animation: 'bounce',
+                messages: ['Tôi đang ở trạng thái tốt nhất!', 'Sẵn sàng giúp bạn mọi thứ!']
+            }
+        };
+	const userAvatars = [
+	  "https://static.vecteezy.com/system/resources/previews/032/997/029/non_2x/adorable-cartoon-boy-sweet-kid-character-cute-child-avatar-ai-generative-png.png",
+	  "https://static.vecteezy.com/system/resources/previews/035/545/356/non_2x/ai-generated-an-anime-boy-with-toy-free-png.png",
+	  "https://dongvat.edu.vn/upload/2025/01/avatar-anime-nu-de-thuong-07.webp",
+	  "https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/482765qhn/anh-mo-ta.png"
+	];
+	const userAvatar = userAvatars[Math.floor(Math.random() * userAvatars.length)]
+        // --- AVATAR & MOOD MANAGEMENT ---
+        function setMood(moodName, reason = '') {
+            if (!MOODS[moodName]) return;
+            
+            chatState.currentMood = moodName;
+            const mood = MOODS[moodName];
+            const avatar = document.getElementById('botAvatar');
+            const moodIndicator = document.getElementById('moodIndicator');
+            const header = document.querySelector('.chat-header');
+            
+            // Update avatar animation
+            avatar.className = `avatar ${mood.animation}`;
+            
+            // Update mood indicator
+            moodIndicator.textContent = mood.emoji;
+            moodIndicator.style.background = mood.color;
+            
+            // Update header gradient if needed
+            if (moodName === 'sad') {
+                header.style.background = mood.gradient;
+            } else {
+                header.style.background = 'var(--primary-gradient)';
+            }
+            
+            // Add mood message if reason provided
+            if (reason) {
+                setTimeout(() => {
+                    const randomMessage = mood.messages[Math.floor(Math.random() * mood.messages.length)];
+                    addMessage({ 
+                        answer: `${randomMessage} ${reason}`,
+                        source: 'mood_change'
+                    }, 'bot');
+                }, 500);
+            }
+        }
+
+        function getRandomMood() {
+            const moodNames = Object.keys(MOODS);
+            const weights = [40, 10, 20, 15, 15]; // happy, sad, excited, thinking, best
+            let random = Math.random() * 100;
+            
+            for (let i = 0; i < weights.length; i++) {
+                random -= weights[i];
+                if (random <= 0) {
+                    return moodNames[i];
+                }
+            }
+            return 'happy';
+        }
+
+        // --- CORE FUNCTIONS ---
+        function resetChatState() {
+            chatState.mode = 'normal';
+            document.getElementById('messageInput').placeholder = "Nhập tin nhắn của bạn...";
+        }
+
+        function enterTrainingMode() {
+            if (chatState.mode !== 'normal') resetChatState();
+            chatState.mode = 'waiting_for_link';
+            setMood('thinking', 'Tôi sẵn sàng học hỏi!');
+            addMessage({ 
+                answer: "Tuyệt vời! Vui lòng dán link Google Docs hoặc Google Sheet bạn muốn dạy cho tôi vào đây.", 
+                source: 'training_mode' 
+            }, 'bot');
+            document.getElementById('messageInput').placeholder = "Dán link tài liệu vào đây và gửi...";
+            document.getElementById('messageInput').focus();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage({ answer: message }, 'user');
+            const questionToProcess = chatState.mode === 'waiting_for_feedback' ? chatState.lastUserQuestion : message;
+            input.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            setMood('thinking');
+            
+            try {
+                let result;
+                if (chatState.mode === 'waiting_for_link') {
+                    result = await jsonpRequest({ action: 'trainFromLink', url: message });
+                    setMood('excited', 'Tôi đã học được điều mới!');
+                    resetChatState();
+                } else if (chatState.mode === 'waiting_for_feedback') {
+                    result = await jsonpRequest({ action: 'updateKnowledge', question: questionToProcess, answer: message });
+                    setMood('happy', 'Cảm ơn bạn đã giúp tôi cải thiện!');
+                    resetChatState();
+                } else {
+                    result = await jsonpRequest({ action: 'query', query: message });
+                    // Random mood change based on response
+                    if (Math.random() < 0.3) {
+                        setMood(getRandomMood());
+                    }
+                }
+                
+                hideTypingIndicator();
+                addMessage(result, 'bot', message);
+                
+            } catch (error) {
+                hideTypingIndicator();
+                setMood('sad', 'Có lỗi xảy ra.');
+                addMessage({ 
+                    answer: "Lỗi kết nối tới server. Vui lòng kiểm tra lại.", 
+                    source: 'error' 
+                }, 'bot');
+            }
+        }
+
+        // --- TYPING INDICATOR ---
+        let typingIndicatorElement = null;
+
+        function showTypingIndicator() {
+            if (typingIndicatorElement) return;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            typingIndicatorElement = document.createElement('div');
+            typingIndicatorElement.className = 'message-wrapper bot';
+            typingIndicatorElement.innerHTML = `
+                <div class="message">
+                    <div class="message-avatar"></div>
+                    <div class="typing-indicator">
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(typingIndicatorElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            if (typingIndicatorElement) {
+                typingIndicatorElement.remove();
+                typingIndicatorElement = null;
+            }
+        }
+
+        // --- MESSAGE DISPLAY ---
+        function addMessage(resultData, sender, originalQuestion = '') {
+            const messagesContainer = document.getElementById('chatMessages');
+            const content = resultData.answer || "Có lỗi xảy ra, vui lòng thử lại.";
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${sender}`;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message`;
+
+			const avatar = document.createElement('div');
+			avatar.className = 'message-avatar';
+
+			if (sender === 'bot') {
+				avatar.style.background = "url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat";
+			} else {
+				avatar.style.background = `url('${userAvatar}') center/cover no-repeat`;
+			}
+
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content.replace(/\n/g, '<br>');
+
+            const timestamp = document.createElement('div');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            wrapper.appendChild(messageDiv);
+            wrapper.appendChild(timestamp);
+
+            // Add interactive elements for bot messages
+            if (sender === 'bot') {
+                // Message actions
+                const actions = document.createElement('div');
+                actions.className = 'message-actions';
+                
+                const copyBtn = document.createElement('div');
+                copyBtn.className = 'action-icon';
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.title = 'Sao chép';
+                copyBtn.onclick = () => copyToClipboard(content, copyBtn);
+                
+                const likeBtn = document.createElement('div');
+                likeBtn.className = 'action-icon';
+                likeBtn.innerHTML = '<i class="fas fa-thumbs-up"></i>';
+                likeBtn.title = 'Thích';
+                likeBtn.onclick = () => {
+                    setMood('happy', 'Cảm ơn bạn!');
+                    likeBtn.style.background = 'var(--success-gradient)';
+                    likeBtn.style.color = 'white';
+                };
+                
+                actions.appendChild(copyBtn);
+                actions.appendChild(likeBtn);
+                messageDiv.appendChild(actions);
+
+                // Action buttons for feedback
+                if (resultData.source && !['confirmation_request', 'training_mode', 'error', 'mood_change'].includes(resultData.source)) {
+                    const actionContainer = document.createElement('div');
+                    actionContainer.className = 'action-buttons';
+                    
+                    const feedbackBtn = createActionButton('✏️ Câu trả lời này sai', () => {
+                        chatState.mode = 'waiting_for_feedback';
+                        chatState.lastUserQuestion = originalQuestion;
+                        setMood('thinking', 'Tôi muốn học hỏi thêm từ bạn.');
+                        addMessage({ 
+                            answer: "Cảm ơn bạn đã góp ý. Vậy câu trả lời đúng nên là gì ạ?", 
+                            source: 'training_mode' 
+                        }, 'bot');
+                        document.getElementById('messageInput').placeholder = "Nhập câu trả lời đúng...";
+                        document.getElementById('messageInput').focus();
+                    });
+                    actionContainer.appendChild(feedbackBtn);
+                }
+
+                // Confirmation buttons
+                if (resultData.needsConfirmation) {
+                    const actionContainer = document.createElement('div');
+                    actionContainer.className = 'action-buttons';
+                    
+                    const yesBtn = createActionButton('👍 Đồng ý, tìm đi', async () => {
+                        yesBtn.parentElement.remove();
+                        addMessage({ answer: "Đồng ý, tìm đi" }, 'user');
+                        setMood('excited', 'Để tôi tìm hiểu cho bạn!');
+                        showTypingIndicator();
+                        const aiResult = await jsonpRequest({ action: 'callGeminiDirectly', query: originalQuestion });
+                        hideTypingIndicator();
+                        setMood('best', 'Đây là thông tin bạn cần!');
+                        addMessage(aiResult, 'bot', originalQuestion);
+                    });
+                    
+                    const noBtn = createActionButton('👎 Thôi, không cần đâu', () => {
+                        noBtn.parentElement.remove();
+                        addMessage({ answer: "Thôi, không cần đâu" }, 'user');
+                        setMood('happy');
+                        addMessage({ 
+                            answer: "Vâng ạ, nếu bạn cần gì khác, hãy cho tôi biết nhé." 
+                        }, 'bot');
+                    });
+                    
+                    actionContainer.appendChild(yesBtn);
+                    actionContainer.appendChild(noBtn);
+                    messageContent.appendChild(actionContainer);
+                }
+
+                // Add single action container if it has children
+                if (resultData.source && !['confirmation_request', 'training_mode', 'error', 'mood_change'].includes(resultData.source)) {
+                    const actionContainer = document.createElement('div');
+                    actionContainer.className = 'action-buttons';
+                    
+                    const feedbackBtn = createActionButton('✏️ Câu trả lời này sai', () => {
+                        chatState.mode = 'waiting_for_feedback';
+                        chatState.lastUserQuestion = originalQuestion;
+                        setMood('thinking', 'Tôi muốn học hỏi thêm từ bạn.');
+                        addMessage({ 
+                            answer: "Cảm ơn bạn đã góp ý. Vậy câu trả lời đúng nên là gì ạ?", 
+                            source: 'training_mode' 
+                        }, 'bot');
+                        document.getElementById('messageInput').placeholder = "Nhập câu trả lời đúng...";
+                        document.getElementById('messageInput').focus();
+                    });
+                    actionContainer.appendChild(feedbackBtn);
+                    messageContent.appendChild(actionContainer);
+                }
+            }
+
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function createActionButton(text, onClick) {
+            const btn = document.createElement('button');
+            btn.className = 'action-btn';
+            btn.textContent = text;
+            btn.onclick = onClick;
+            return btn;
+        }
+
+        function copyToClipboard(text, buttonElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalIcon = buttonElement.innerHTML;
+                buttonElement.innerHTML = '<i class="fas fa-check"></i>';
+                buttonElement.style.background = 'var(--success-gradient)';
+                buttonElement.style.color = 'white';
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalIcon;
+                    buttonElement.style.background = '';
+                    buttonElement.style.color = '';
+                }, 2000);
+            });
+        }
+
+        // --- BACKEND COMMUNICATION ---
+        function jsonpRequest(params) {
+            return new Promise((resolve) => {
+                const script = document.createElement("script");
+                const callbackName = "jsonp_callback_" + Date.now() + Math.floor(Math.random() * 1000);
+                window[callbackName] = (data) => { resolve(data); cleanup(); };
+                script.onerror = () => { 
+                    resolve({ 
+                        success: false, 
+                        answer: "Lỗi kết nối server (JSONP)." 
+                    }); 
+                    cleanup(); 
+                };
+                
+                function cleanup() { 
+                    try { document.head.removeChild(script); } catch(e) {} 
+                    delete window[callbackName]; 
+                }
+                
+                params.callback = callbackName;
+                const searchParams = new URLSearchParams(params);
+                script.src = CONFIG.GOOGLE_APPS_SCRIPT_URL + "?" + searchParams.toString();
+                document.head.appendChild(script);
+                
+                setTimeout(() => { 
+                    if (window[callbackName]) { 
+                        resolve({ 
+                            success: false, 
+                            answer: "Yêu cầu hết thời gian chờ." 
+                        }); 
+                        cleanup(); 
+                    } 
+                }, 20000);
+            });
+        }
+
+        // --- STATUS MANAGEMENT ---
+        function updateBotStatus(statusClass, statusText) {
+            const statusDiv = document.getElementById('botStatus');
+            const statusTextSpan = document.getElementById('botStatusText');
+            statusDiv.className = `status ${statusClass}`;
+            statusTextSpan.textContent = statusText;
+            
+            const isOnline = statusClass === 'online';
+            document.getElementById('messageInput').disabled = !isOnline;
+            document.getElementById('sendBtn').disabled = !isOnline;
+        }
+
+        // --- BACKGROUND PARTICLES ---
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random size between 4-12px
+                const size = Math.random() * 8 + 4;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
+                // Random position
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                
+                // Random animation delay
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // --- WEATHER-BASED MOOD ---
+        function setWeatherMood() {
+            const hour = new Date().getHours();
+            const isNight = hour < 6 || hour > 20;
+            const isEvening = hour >= 17 && hour <= 20;
+            const isMorning = hour >= 6 && hour <= 11;
+            
+            if (isNight) {
+                setMood('thinking', 'Đêm khuya rồi, bạn còn thức à?');
+            } else if (isMorning) {
+                setMood('best', 'Chào buổi sáng! Hôm nay tôi đang trong trạng thái tuyệt vời!');
+            } else if (isEvening) {
+                setMood('happy', 'Buổi chiều vui vẻ!');
+            } else {
+                setMood('excited', 'Buổi trua tràn đầy năng lượng!');
+            }
+        }
+
+        // --- INITIALIZATION ---
+        function initApp() {
+            updateBotStatus('online', 'Đang hoạt động');
+            createParticles();
+            
+            // Set initial mood based on time
+            setTimeout(() => setWeatherMood(), 1000);
+            
+            // Event listeners
+            const messageInput = document.getElementById('messageInput');
+            messageInput.addEventListener('keypress', e => { 
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(); 
+                }
+            });
+            
+            // Focus input when clicking container
+            document.querySelector('.chat-container').addEventListener('click', (e) => {
+                if (!messageInput.disabled && !e.target.closest('.message-actions')) {
+                    messageInput.focus();
+                }
+            });
+            
+            // Welcome message
+            setTimeout(() => {
+                addMessage({ 
+                    answer: "Xin chào! Tôi là Mimi, trợ lý AI thông minh của bạn. Tôi có thể trò chuyện, giải đáp thắc mắc và học hỏi từ bạn. Bạn có thể hỏi tôi bất cứ điều gì hoặc nhấn nút bên dưới để dạy cho tôi kiến thức mới! 🌟" 
+                }, 'bot');
+            }, 500);
+            
+            // Random mood changes during idle time
+            setInterval(() => {
+                if (Math.random() < 0.1) { // 10% chance every 30 seconds
+                    setMood(getRandomMood());
+                }
+            }, 30000);
+        }
+        
+        // Start the application
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
