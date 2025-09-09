@@ -544,6 +544,30 @@
 		.message-wrapper.bot .message-avatar i {
 			display: none !important;
 		}
+        .searching-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 20px;
+            border-bottom-left-radius: 6px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-soft);
+            font-style: italic;
+            color: var(--text-secondary);
+            font-size: 15px;
+            animation: messageSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .searching-indicator .spinner {
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -724,23 +748,22 @@
             const questionToProcess = chatState.mode === 'waiting_for_feedback' ? chatState.lastUserQuestion : message;
             input.value = '';
             
-            // Show typing indicator
             showTypingIndicator();
             setMood('thinking');
             
             try {
                 let result;
+                // Sử dụng hàm apiRequest mới (dùng fetch)
                 if (chatState.mode === 'waiting_for_link') {
-                    result = await jsonpRequest({ action: 'trainFromLink', url: message });
+                    result = await apiRequest({ action: 'trainFromLink', url: message });
                     setMood('excited', 'Tôi đã học được điều mới!');
                     resetChatState();
                 } else if (chatState.mode === 'waiting_for_feedback') {
-                    result = await jsonpRequest({ action: 'updateKnowledge', question: questionToProcess, answer: message });
+                    result = await apiRequest({ action: 'updateKnowledge', question: questionToProcess, answer: message });
                     setMood('happy', 'Cảm ơn bạn đã giúp tôi cải thiện!');
                     resetChatState();
                 } else {
-                    result = await jsonpRequest({ action: 'query', query: message });
-                    // Random mood change based on response
+                    result = await apiRequest({ action: 'query', query: message });
                     if (Math.random() < 0.3) {
                         setMood(getRandomMood());
                     }
@@ -758,8 +781,7 @@
                 }, 'bot');
             }
         }
-
-        // --- TYPING INDICATOR ---
+        // --- TYPING INDICATOR (PHIÊN BẢN CẢI TIẾN) ---
         let typingIndicatorElement = null;
 
         function showTypingIndicator() {
@@ -768,15 +790,13 @@
             const messagesContainer = document.getElementById('chatMessages');
             typingIndicatorElement = document.createElement('div');
             typingIndicatorElement.className = 'message-wrapper bot';
+            // Sử dụng HTML mới để hiển thị thông báo sinh động
             typingIndicatorElement.innerHTML = `
                 <div class="message">
                     <div class="message-avatar"></div>
-                    <div class="typing-indicator">
-                        <div class="typing-dots">
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                        </div>
+                    <div class="searching-indicator">
+                        <i class="fas fa-spinner spinner"></i>
+                        <span>Mimi đang tìm câu trả lời cho bạn, bạn vui lòng chờ xíu nha...</span>
                     </div>
                 </div>
             `;
@@ -791,7 +811,6 @@
             }
         }
 
-        // --- MESSAGE DISPLAY ---
         function addMessage(resultData, sender, originalQuestion = '') {
             const messagesContainer = document.getElementById('chatMessages');
             const content = resultData.answer || "Có lỗi xảy ra, vui lòng thử lại.";
@@ -802,15 +821,14 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message`;
 
-			const avatar = document.createElement('div');
-			avatar.className = 'message-avatar';
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
 
-			if (sender === 'bot') {
-				avatar.style.background = "url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat";
-			} else {
-				avatar.style.background = `url('${userAvatar}') center/cover no-repeat`;
-			}
-
+            if (sender === 'bot') {
+                avatar.style.background = "url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat";
+            } else {
+                avatar.style.background = `url('${userAvatar}') center/cover no-repeat`;
+            }
 
             const messageContent = document.createElement('div');
             messageContent.className = 'message-content';
@@ -825,9 +843,8 @@
             wrapper.appendChild(messageDiv);
             wrapper.appendChild(timestamp);
 
-            // Add interactive elements for bot messages
+            // Thêm các nút tương tác cho tin nhắn của bot
             if (sender === 'bot') {
-                // Message actions
                 const actions = document.createElement('div');
                 actions.className = 'message-actions';
                 
@@ -851,36 +868,34 @@
                 actions.appendChild(likeBtn);
                 messageDiv.appendChild(actions);
 
-                // Action buttons for feedback
+                // Action buttons container (chỉ tạo một lần để chứa tất cả các nút)
+                const actionContainer = document.createElement('div');
+                actionContainer.className = 'action-buttons';
+
+                // Nút phản hồi "Câu trả lời này sai"
                 if (resultData.source && !['confirmation_request', 'training_mode', 'error', 'mood_change'].includes(resultData.source)) {
-                    const actionContainer = document.createElement('div');
-                    actionContainer.className = 'action-buttons';
-                    
                     const feedbackBtn = createActionButton('✏️ Câu trả lời này sai', () => {
                         chatState.mode = 'waiting_for_feedback';
                         chatState.lastUserQuestion = originalQuestion;
                         setMood('thinking', 'Tôi muốn học hỏi thêm từ bạn.');
-                        addMessage({ 
-                            answer: "Cảm ơn bạn đã góp ý. Vậy câu trả lời đúng nên là gì ạ?", 
-                            source: 'training_mode' 
-                        }, 'bot');
+                        addMessage({ answer: "Cảm ơn bạn đã góp ý. Vậy câu trả lời đúng nên là gì ạ?", source: 'training_mode' }, 'bot');
                         document.getElementById('messageInput').placeholder = "Nhập câu trả lời đúng...";
                         document.getElementById('messageInput').focus();
                     });
                     actionContainer.appendChild(feedbackBtn);
                 }
 
-                // Confirmation buttons
+                // Các nút xác nhận hỏi AI
                 if (resultData.needsConfirmation) {
-                    const actionContainer = document.createElement('div');
-                    actionContainer.className = 'action-buttons';
-                    
                     const yesBtn = createActionButton('👍 Đồng ý, tìm đi', async () => {
                         yesBtn.parentElement.remove();
                         addMessage({ answer: "Đồng ý, tìm đi" }, 'user');
                         setMood('excited', 'Để tôi tìm hiểu cho bạn!');
                         showTypingIndicator();
-                        const aiResult = await jsonpRequest({ action: 'callGeminiDirectly', query: originalQuestion });
+                        
+                        // THAY ĐỔI: Gọi apiRequest thay vì jsonpRequest
+                        const aiResult = await apiRequest({ action: 'callGeminiDirectly', query: originalQuestion });
+                        
                         hideTypingIndicator();
                         setMood('best', 'Đây là thông tin bạn cần!');
                         addMessage(aiResult, 'bot', originalQuestion);
@@ -890,33 +905,15 @@
                         noBtn.parentElement.remove();
                         addMessage({ answer: "Thôi, không cần đâu" }, 'user');
                         setMood('happy');
-                        addMessage({ 
-                            answer: "Vâng ạ, nếu bạn cần gì khác, hãy cho tôi biết nhé." 
-                        }, 'bot');
+                        addMessage({ answer: "Vâng ạ, nếu bạn cần gì khác, hãy cho tôi biết nhé." }, 'bot');
                     });
                     
                     actionContainer.appendChild(yesBtn);
                     actionContainer.appendChild(noBtn);
-                    messageContent.appendChild(actionContainer);
                 }
-
-                // Add single action container if it has children
-                if (resultData.source && !['confirmation_request', 'training_mode', 'error', 'mood_change'].includes(resultData.source)) {
-                    const actionContainer = document.createElement('div');
-                    actionContainer.className = 'action-buttons';
-                    
-                    const feedbackBtn = createActionButton('✏️ Câu trả lời này sai', () => {
-                        chatState.mode = 'waiting_for_feedback';
-                        chatState.lastUserQuestion = originalQuestion;
-                        setMood('thinking', 'Tôi muốn học hỏi thêm từ bạn.');
-                        addMessage({ 
-                            answer: "Cảm ơn bạn đã góp ý. Vậy câu trả lời đúng nên là gì ạ?", 
-                            source: 'training_mode' 
-                        }, 'bot');
-                        document.getElementById('messageInput').placeholder = "Nhập câu trả lời đúng...";
-                        document.getElementById('messageInput').focus();
-                    });
-                    actionContainer.appendChild(feedbackBtn);
+                
+                // Chỉ thêm actionContainer vào tin nhắn nếu nó có chứa nút bấm
+                if (actionContainer.hasChildNodes()) {
                     messageContent.appendChild(actionContainer);
                 }
             }
@@ -946,42 +943,61 @@
                 }, 2000);
             });
         }
+        async function apiRequest(params) {
+            const url = new URL(CONFIG.GOOGLE_APPS_SCRIPT_URL);
+            Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
-        // --- BACKEND COMMUNICATION ---
-        function jsonpRequest(params) {
-            return new Promise((resolve) => {
-                const script = document.createElement("script");
-                const callbackName = "jsonp_callback_" + Date.now() + Math.floor(Math.random() * 1000);
-                window[callbackName] = (data) => { resolve(data); cleanup(); };
-                script.onerror = () => { 
-                    resolve({ 
-                        success: false, 
-                        answer: "Lỗi kết nối server (JSONP)." 
-                    }); 
-                    cleanup(); 
-                };
-                
-                function cleanup() { 
-                    try { document.head.removeChild(script); } catch(e) {} 
-                    delete window[callbackName]; 
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
-                params.callback = callbackName;
-                const searchParams = new URLSearchParams(params);
-                script.src = CONFIG.GOOGLE_APPS_SCRIPT_URL + "?" + searchParams.toString();
-                document.head.appendChild(script);
-                
-                setTimeout(() => { 
-                    if (window[callbackName]) { 
-                        resolve({ 
-                            success: false, 
-                            answer: "Yêu cầu hết thời gian chờ." 
-                        }); 
-                        cleanup(); 
-                    } 
-                }, 20000);
-            });
+                return await response.json();
+            } catch (error) {
+                console.error("API Request Error:", error);
+                throw error; // Ném lỗi ra để khối catch trong sendMessage có thể bắt được
+            }
         }
+
+        // // --- BACKEND COMMUNICATION ---
+        // function jsonpRequest(params) {
+        //     return new Promise((resolve, reject) => {
+        //         const script = document.createElement("script");
+        //         const callbackName = "jsonp_callback_" + Date.now() + Math.floor(Math.random() * 1000);
+                
+        //         const cleanup = () => { 
+        //             try { document.head.removeChild(script); } catch(e) {} 
+        //             delete window[callbackName]; 
+        //         }
+
+        //         window[callbackName] = (data) => {
+        //             resolve(data);
+        //             cleanup();
+        //         };
+
+        //         // Khi có lỗi mạng (ví dụ: không thể tải script), gọi "reject"
+        //         script.onerror = () => { 
+        //             reject(new Error("Lỗi kết nối server (JSONP).")); 
+        //             cleanup(); 
+        //         };
+                
+        //         params.callback = callbackName;
+        //         const searchParams = new URLSearchParams(params);
+        //         script.src = CONFIG.GOOGLE_APPS_SCRIPT_URL + "?" + searchParams.toString();
+        //         document.head.appendChild(script);
+
+        //         // Khi hết thời gian chờ (60 giây), gọi "reject"
+        //         setTimeout(() => { 
+        //             if (window[callbackName]) { 
+        //                 reject(new Error("Yêu cầu hết thời gian chờ."));
+        //                 cleanup(); 
+        //             } 
+        //         }, 60000);
+        //     });
+        // }
 
         // --- STATUS MANAGEMENT ---
         function updateBotStatus(statusClass, statusText) {
@@ -1035,7 +1051,7 @@
             } else if (isEvening) {
                 setMood('happy', 'Buổi chiều vui vẻ!');
             } else {
-                setMood('excited', 'Buổi trua tràn đầy năng lượng!');
+                setMood('excited', 'Buổi trưa tràn đầy năng lượng!');
             }
         }
 
