@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,22 +116,22 @@
             height: 72px;
         }
 
-		.avatar {
-			width: 72px;
-			height: 72px;
-			border-radius: 50%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 32px;
-			transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-			border: 3px solid rgba(255,255,255,0.2);
-			position: relative;
-			overflow: hidden;
-			background: url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat;
-		}
-		.avatar i {
-			display: none !important;
+        .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 3px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+            background: url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat;
+        }
+        .avatar i {
+            display: none !important;
 }
 
         .mood-indicator {
@@ -241,9 +242,11 @@
             border-radius: 20px;
             font-size: 15px;
             line-height: 1.5;
-            word-wrap: break-word;
             position: relative;
             box-shadow: var(--shadow-soft);
+            max-width: 350px;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
         
         .message-wrapper.user { 
@@ -505,7 +508,7 @@
         .avatar.thinking {
             animation: pulse-glow 2s ease-in-out infinite;
         }
-		@keyframes pulse-glow {
+        @keyframes pulse-glow {
     0%, 100% {
         transform: scale(1);
         box-shadow: 0 0 5px rgba(102, 126, 234, 0.2);
@@ -537,13 +540,13 @@
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-		.message-wrapper.bot .message-avatar {
-			background: url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat;
-		}
+        .message-wrapper.bot .message-avatar {
+            background: url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat;
+        }
 
-		.message-wrapper.bot .message-avatar i {
-			display: none !important;
-		}
+        .message-wrapper.bot .message-avatar i {
+            display: none !important;
+        }
         .searching-indicator {
             display: flex;
             align-items: center;
@@ -570,6 +573,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Background Particles -->
     <div class="bg-particles" id="particles"></div>
@@ -593,16 +597,16 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="chat-messages" id="chatMessages"></div>
-        
+
         <div class="quick-actions">
             <button class="action-btn" onclick="enterTrainingMode()">
                 <i class="fas fa-graduation-cap"></i>
-                Dạy kiến thức mới cho Mimi
+Dạy kiến thức mới cho Mimi
             </button>
         </div>
-        
+
         <div class="chat-input">
             <div class="input-container">
                 <input type="text" id="messageInput" placeholder="Nhập tin nhắn của bạn..." disabled>
@@ -616,7 +620,7 @@
     <script>
         // --- CONFIG & STATE MANAGEMENT ---
         const CONFIG = {
-            GOOGLE_APPS_SCRIPT_URL: 'https://chatbot.mochanlang.workers.dev',
+            GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwMoW2ACPYuiM2c5xcJFhJuNQy7MA8SFEDvx46DOxXhG0I-014CXy-V42gmCMZpVhRk/exec',
             SESSION_ID: 'session_' + Date.now()
         };
         
@@ -664,13 +668,13 @@
                 messages: ['Tôi đang ở trạng thái tốt nhất!', 'Sẵn sàng giúp bạn mọi thứ!']
             }
         };
-	const userAvatars = [
-	  "https://static.vecteezy.com/system/resources/previews/032/997/029/non_2x/adorable-cartoon-boy-sweet-kid-character-cute-child-avatar-ai-generative-png.png",
-	  "https://static.vecteezy.com/system/resources/previews/035/545/356/non_2x/ai-generated-an-anime-boy-with-toy-free-png.png",
-	  "https://dongvat.edu.vn/upload/2025/01/avatar-anime-nu-de-thuong-07.webp",
-	  "https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/482765qhn/anh-mo-ta.png"
-	];
-	const userAvatar = userAvatars[Math.floor(Math.random() * userAvatars.length)]
+    const userAvatars = [
+      "https://static.vecteezy.com/system/resources/previews/032/997/029/non_2x/adorable-cartoon-boy-sweet-kid-character-cute-child-avatar-ai-generative-png.png",
+      "https://static.vecteezy.com/system/resources/previews/035/545/356/non_2x/ai-generated-an-anime-boy-with-toy-free-png.png",
+      "https://dongvat.edu.vn/upload/2025/01/avatar-anime-nu-de-thuong-07.webp",
+      "https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/482765qhn/anh-mo-ta.png"
+    ];
+    const userAvatar = userAvatars[Math.floor(Math.random() * userAvatars.length)]
         // --- AVATAR & MOOD MANAGEMENT ---
         function setMood(moodName, reason = '') {
             if (!MOODS[moodName]) return;
@@ -748,22 +752,23 @@
             const questionToProcess = chatState.mode === 'waiting_for_feedback' ? chatState.lastUserQuestion : message;
             input.value = '';
             
+            // Show typing indicator
             showTypingIndicator();
             setMood('thinking');
             
             try {
                 let result;
-                // Sử dụng hàm apiRequest mới (dùng fetch)
                 if (chatState.mode === 'waiting_for_link') {
-                    result = await apiRequest({ action: 'trainFromLink', url: message });
+                    result = await jsonpRequest({ action: 'trainFromLink', url: message });
                     setMood('excited', 'Tôi đã học được điều mới!');
                     resetChatState();
                 } else if (chatState.mode === 'waiting_for_feedback') {
-                    result = await apiRequest({ action: 'updateKnowledge', question: questionToProcess, answer: message });
+                    result = await jsonpRequest({ action: 'updateKnowledge', question: questionToProcess, answer: message });
                     setMood('happy', 'Cảm ơn bạn đã giúp tôi cải thiện!');
                     resetChatState();
                 } else {
-                    result = await apiRequest({ action: 'query', query: message });
+                    result = await jsonpRequest({ action: 'query', query: message });
+                    // Random mood change based on response
                     if (Math.random() < 0.3) {
                         setMood(getRandomMood());
                     }
@@ -781,7 +786,6 @@
                 }, 'bot');
             }
         }
-        // --- TYPING INDICATOR (PHIÊN BẢN CẢI TIẾN) ---
         let typingIndicatorElement = null;
 
         function showTypingIndicator() {
@@ -790,7 +794,6 @@
             const messagesContainer = document.getElementById('chatMessages');
             typingIndicatorElement = document.createElement('div');
             typingIndicatorElement.className = 'message-wrapper bot';
-            // Sử dụng HTML mới để hiển thị thông báo sinh động
             typingIndicatorElement.innerHTML = `
                 <div class="message">
                     <div class="message-avatar"></div>
@@ -810,117 +813,134 @@
                 typingIndicatorElement = null;
             }
         }
+function addMessage(resultData, sender, originalQuestion = '') {
+    if (!resultData || typeof resultData.answer === 'undefined') {
+        console.error("addMessage nhận được dữ liệu không hợp lệ:", resultData);
+        resultData = { 
+            answer: "Đã có lỗi xử lý phản hồi từ server. Vui lòng thử lại.",
+            source: 'error'
+        };
+    }
+    
+    //console.log("%c[1] BẮT ĐẦU addMessage", "color: blue; font-weight: bold;", {data: resultData, sender: sender});
 
-        function addMessage(resultData, sender, originalQuestion = '') {
-            const messagesContainer = document.getElementById('chatMessages');
-            const content = resultData.answer || "Có lỗi xảy ra, vui lòng thử lại.";
-
-            const wrapper = document.createElement('div');
-            wrapper.className = `message-wrapper ${sender}`;
-
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message`;
-
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-
-            if (sender === 'bot') {
-                avatar.style.background = "url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat";
-            } else {
-                avatar.style.background = `url('${userAvatar}') center/cover no-repeat`;
-            }
-
-            const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
-            messageContent.innerHTML = content.replace(/\n/g, '<br>');
-
-            const timestamp = document.createElement('div');
-            timestamp.className = 'timestamp';
-            timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(messageContent);
-            wrapper.appendChild(messageDiv);
-            wrapper.appendChild(timestamp);
-
-            // Thêm các nút tương tác cho tin nhắn của bot
-            if (sender === 'bot') {
-                const actions = document.createElement('div');
-                actions.className = 'message-actions';
-                
-                const copyBtn = document.createElement('div');
-                copyBtn.className = 'action-icon';
-                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
-                copyBtn.title = 'Sao chép';
-                copyBtn.onclick = () => copyToClipboard(content, copyBtn);
-                
-                const likeBtn = document.createElement('div');
-                likeBtn.className = 'action-icon';
-                likeBtn.innerHTML = '<i class="fas fa-thumbs-up"></i>';
-                likeBtn.title = 'Thích';
-                likeBtn.onclick = () => {
-                    setMood('happy', 'Cảm ơn bạn!');
-                    likeBtn.style.background = 'var(--success-gradient)';
-                    likeBtn.style.color = 'white';
-                };
-                
-                actions.appendChild(copyBtn);
-                actions.appendChild(likeBtn);
-                messageDiv.appendChild(actions);
-
-                // Action buttons container (chỉ tạo một lần để chứa tất cả các nút)
-                const actionContainer = document.createElement('div');
-                actionContainer.className = 'action-buttons';
-
-                // Nút phản hồi "Câu trả lời này sai"
-                if (resultData.source && !['confirmation_request', 'training_mode', 'error', 'mood_change'].includes(resultData.source)) {
-                    const feedbackBtn = createActionButton('✏️ Câu trả lời này sai', () => {
-                        chatState.mode = 'waiting_for_feedback';
-                        chatState.lastUserQuestion = originalQuestion;
-                        setMood('thinking', 'Tôi muốn học hỏi thêm từ bạn.');
-                        addMessage({ answer: "Cảm ơn bạn đã góp ý. Vậy câu trả lời đúng nên là gì ạ?", source: 'training_mode' }, 'bot');
-                        document.getElementById('messageInput').placeholder = "Nhập câu trả lời đúng...";
-                        document.getElementById('messageInput').focus();
-                    });
-                    actionContainer.appendChild(feedbackBtn);
-                }
-
-                // Các nút xác nhận hỏi AI
-                if (resultData.needsConfirmation) {
-                    const yesBtn = createActionButton('👍 Đồng ý, tìm đi', async () => {
-                        yesBtn.parentElement.remove();
-                        addMessage({ answer: "Đồng ý, tìm đi" }, 'user');
-                        setMood('excited', 'Để tôi tìm hiểu cho bạn!');
-                        showTypingIndicator();
-                        
-                        // THAY ĐỔI: Gọi apiRequest thay vì jsonpRequest
-                        const aiResult = await apiRequest({ action: 'callGeminiDirectly', query: originalQuestion });
-                        
-                        hideTypingIndicator();
-                        setMood('best', 'Đây là thông tin bạn cần!');
-                        addMessage(aiResult, 'bot', originalQuestion);
-                    });
-                    
-                    const noBtn = createActionButton('👎 Thôi, không cần đâu', () => {
-                        noBtn.parentElement.remove();
-                        addMessage({ answer: "Thôi, không cần đâu" }, 'user');
-                        setMood('happy');
-                        addMessage({ answer: "Vâng ạ, nếu bạn cần gì khác, hãy cho tôi biết nhé." }, 'bot');
-                    });
-                    
-                    actionContainer.appendChild(yesBtn);
-                    actionContainer.appendChild(noBtn);
-                }
-                
-                // Chỉ thêm actionContainer vào tin nhắn nếu nó có chứa nút bấm
-                if (actionContainer.hasChildNodes()) {
-                    messageContent.appendChild(actionContainer);
-                }
-            }
-
-            messagesContainer.appendChild(wrapper);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    try {
+        const messagesContainer = document.getElementById('chatMessages');
+        if (!messagesContainer) {
+            console.error("LỖI NGHIÊM TRỌNG: Không tìm thấy 'chatMessages' container!");
+            return;
         }
+
+        const content = String(resultData.answer || "Có lỗi xảy ra, vui lòng thử lại.");
+        //console.log("[2] Nội dung tin nhắn đã được xác định:", content);
+
+        const wrapper = document.createElement('div');
+        wrapper.className = `message-wrapper ${sender}`;
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message`;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'message-avatar';
+        if (sender === 'bot') {
+            avatar.style.background = "url('https://t3.ftcdn.net/jpg/07/57/37/32/360_F_757373275_uLWefjiWxBJGCMs35LsFaS3IYTiA2gKB.jpg') center/cover no-repeat";
+        } else {
+            avatar.style.background = `url('${userAvatar}') center/cover no-repeat`;
+        }
+
+        const messageContent = document.createElement('div');
+        messageContent.className = 'message-content';
+        messageContent.innerHTML = content.replace(/\n/g, '<br>');
+        //console.log("[3] Đã tạo xong nội dung HTML chính.");
+
+        const timestamp = document.createElement('div');
+        timestamp.className = 'timestamp';
+        timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageContent);
+        wrapper.appendChild(messageDiv);
+        wrapper.appendChild(timestamp);
+        //console.log("[4] Đã ráp xong các thành phần cơ bản của tin nhắn.");
+
+        if (sender === 'bot') {
+            const actions = document.createElement('div');
+            actions.className = 'message-actions';
+            
+            const copyBtn = document.createElement('div');
+            copyBtn.className = 'action-icon';
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+            copyBtn.title = 'Sao chép';
+            copyBtn.onclick = () => copyToClipboard(content, copyBtn);
+            
+            const likeBtn = document.createElement('div');
+            likeBtn.className = 'action-icon';
+            likeBtn.innerHTML = '<i class="fas fa-thumbs-up"></i>';
+            likeBtn.title = 'Thích';
+            likeBtn.onclick = () => {
+                setMood('happy', 'Cảm ơn bạn!');
+                likeBtn.style.background = 'var(--success-gradient)';
+                likeBtn.style.color = 'white';
+            };
+            
+            actions.appendChild(copyBtn);
+            actions.appendChild(likeBtn);
+            messageDiv.appendChild(actions);
+
+            const actionContainer = document.createElement('div');
+            actionContainer.className = 'action-buttons';
+
+            if (resultData.source && !['confirmation_request', 'training_mode', 'error', 'mood_change'].includes(resultData.source)) {
+                const feedbackBtn = createActionButton('✏️ Câu trả lời này sai', () => {
+                    chatState.mode = 'waiting_for_feedback';
+                    chatState.lastUserQuestion = originalQuestion;
+                    setMood('thinking', 'Tôi muốn học hỏi thêm từ bạn.');
+                    addMessage({ answer: "Cảm ơn bạn đã góp ý. Vậy câu trả lời đúng nên là gì ạ?", source: 'training_mode' }, 'bot');
+                    document.getElementById('messageInput').placeholder = "Nhập câu trả lời đúng...";
+                    document.getElementById('messageInput').focus();
+                });
+                actionContainer.appendChild(feedbackBtn);
+            }
+
+            if (resultData.needsConfirmation) {
+                const yesBtn = createActionButton('👍 Đồng ý, tìm đi', async () => {
+                    yesBtn.parentElement.remove();
+                    addMessage({ answer: "Đồng ý, tìm đi" }, 'user');
+                    setMood('excited', 'Để tôi tìm hiểu cho bạn!');
+                    showTypingIndicator();
+                    const aiResult = await jsonpRequest({ action: 'callGeminiDirectly', query: originalQuestion });
+                    hideTypingIndicator();
+                    setMood('best', 'Đây là thông tin bạn cần!');
+                    addMessage(aiResult, 'bot', originalQuestion);
+                });
+                
+                const noBtn = createActionButton('👎 Thôi, không cần đâu', () => {
+                    noBtn.parentElement.remove();
+                    addMessage({ answer: "Thôi, không cần đâu" }, 'user');
+                    setMood('happy');
+                    addMessage({ answer: "Vâng ạ, nếu bạn cần gì khác, hãy cho tôi biết nhé." }, 'bot');
+                });
+                
+                actionContainer.appendChild(yesBtn);
+                actionContainer.appendChild(noBtn);
+            }
+            
+            if (actionContainer.hasChildNodes()) {
+                messageContent.appendChild(actionContainer);
+            }
+            //console.log("[5] Đã xử lý xong các nút bấm cho bot.");
+        }
+
+        //console.log("%c[6] CHUẨN BỊ APPEND VÀO DOM", "background: #28a745; color: white; padding: 2px 5px; border-radius: 3px;");
+        messagesContainer.appendChild(wrapper);
+        //console.log("%c[7] ĐÃ APPEND THÀNH CÔNG!", "background: #28a745; color: white; font-weight: bold; padding: 2px 5px; border-radius: 3px;");
+        
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    } catch (error) {
+        console.error("!!! LỖI BÊN TRONG HÀM addMessage !!!", error);
+    }
+}        
 
         function createActionButton(text, onClick) {
             const btn = document.createElement('button');
@@ -943,61 +963,41 @@
                 }, 2000);
             });
         }
-        async function apiRequest(params) {
-            const url = new URL(CONFIG.GOOGLE_APPS_SCRIPT_URL);
-            Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
-            try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    redirect: 'follow'
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+        // --- BACKEND COMMUNICATION ---
+        function jsonpRequest(params) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                const callbackName = "jsonp_callback_" + Date.now() + Math.floor(Math.random() * 1000);
+                
+                const cleanup = () => { 
+                    try { document.head.removeChild(script); } catch(e) {} 
+                    delete window[callbackName]; 
                 }
-                return await response.json();
-            } catch (error) {
-                console.error("API Request Error:", error);
-                throw error; // Ném lỗi ra để khối catch trong sendMessage có thể bắt được
-            }
+
+                window[callbackName] = (data) => {
+                    resolve(data);
+                    cleanup();
+                };
+
+                script.onerror = () => { 
+                    reject(new Error("Lỗi kết nối server (JSONP).")); 
+                    cleanup(); 
+                };
+                
+                params.callback = callbackName;
+                const searchParams = new URLSearchParams(params);
+                script.src = CONFIG.GOOGLE_APPS_SCRIPT_URL + "?" + searchParams.toString();
+                document.head.appendChild(script);
+
+                setTimeout(() => { 
+                    if (window[callbackName]) { 
+                        reject(new Error("Yêu cầu hết thời gian chờ."));
+                        cleanup(); 
+                    } 
+                }, 60000);
+            });
         }
-
-        // // --- BACKEND COMMUNICATION ---
-        // function jsonpRequest(params) {
-        //     return new Promise((resolve, reject) => {
-        //         const script = document.createElement("script");
-        //         const callbackName = "jsonp_callback_" + Date.now() + Math.floor(Math.random() * 1000);
-                
-        //         const cleanup = () => { 
-        //             try { document.head.removeChild(script); } catch(e) {} 
-        //             delete window[callbackName]; 
-        //         }
-
-        //         window[callbackName] = (data) => {
-        //             resolve(data);
-        //             cleanup();
-        //         };
-
-        //         // Khi có lỗi mạng (ví dụ: không thể tải script), gọi "reject"
-        //         script.onerror = () => { 
-        //             reject(new Error("Lỗi kết nối server (JSONP).")); 
-        //             cleanup(); 
-        //         };
-                
-        //         params.callback = callbackName;
-        //         const searchParams = new URLSearchParams(params);
-        //         script.src = CONFIG.GOOGLE_APPS_SCRIPT_URL + "?" + searchParams.toString();
-        //         document.head.appendChild(script);
-
-        //         // Khi hết thời gian chờ (60 giây), gọi "reject"
-        //         setTimeout(() => { 
-        //             if (window[callbackName]) { 
-        //                 reject(new Error("Yêu cầu hết thời gian chờ."));
-        //                 cleanup(); 
-        //             } 
-        //         }, 60000);
-        //     });
-        // }
 
         // --- STATUS MANAGEMENT ---
         function updateBotStatus(statusClass, statusText) {
@@ -1088,7 +1088,7 @@
             
             // Random mood changes during idle time
             setInterval(() => {
-                if (Math.random() < 0.1) { // 10% chance every 30 seconds
+                if (Math.random() < 0.1) {
                     setMood(getRandomMood());
                 }
             }, 30000);
@@ -1098,5 +1098,5 @@
         window.addEventListener('load', initApp);
     </script>
 </body>
-</html>
 
+</html>
